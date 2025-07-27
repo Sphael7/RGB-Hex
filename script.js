@@ -16,8 +16,7 @@ const colorPreviewBox = document.getElementById('colorPreviewBox');
 const rgbaCombinedOutput = document.getElementById('rgbaCombinedOutput'); // Untuk clipboard.js
 const colorMeaningText = document.getElementById('colorMeaning');
 
-const randomizerBtn = document.getElementById('randomizerBtn'); // Tombol randomizer untuk HEX/Picker
-const randomizerBtnSlider = document.getElementById('randomizerBtnSlider'); // Tombol randomizer untuk Slider
+// randomizerBtn dan randomizerBtnSlider dihapus
 
 const copyHexBtn = document.getElementById('copyHexBtn');
 const copyRgbaBtn = document.getElementById('copyRgbaBtn');
@@ -501,20 +500,7 @@ document.querySelectorAll('.slider-adjust-btn').forEach(button => {
 });
 
 
-/**
- * Menghasilkan warna acak (untuk kedua tombol).
- */
-const generateRandomColor = () => {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
-    const a = 1; // Alpha penuh
-    updateColor({ r, g, b, a });
-    showMessage('Warna acak baru tercipta! ✨', 'info');
-};
-
-randomizerBtn.addEventListener('click', generateRandomColor);
-randomizerBtnSlider.addEventListener('click', generateRandomColor);
+// Fungsi generateRandomColor dan event listener-nya dihapus di sini
 
 
 /**
@@ -701,7 +687,7 @@ moodBoardBtnSide.addEventListener('click', () => {
             case 'split-complementary':
                 colors.push(hslToRgb(h, s, l));
                 colors.push(hslToRgb((h + 180 - 30 + 360) % 360, s, l));
-                colors.push(hslToRgb((h + 180 + 30) % 360, s, l));
+                colors.push(hslToHsl((h + 180 + 30) % 360, s, l));
                 break;
         }
         return colors.map(rgb => rgbaToHex({ ...rgb, a: 1 })); // Convert all to HEX for display

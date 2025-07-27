@@ -729,15 +729,19 @@ footer {
         padding-bottom: 15px; /* Tambahkan padding agar tidak terlalu mepet dengan scrollbar */
     }
 
+    /* Penyesuaian khusus untuk tombol slider di mobile agar lebih ringkas */
     .slider-with-buttons {
-        flex-wrap: wrap; /* Izinkan tombol wrap jika ruang sempit */
+        flex-wrap: nowrap; /* Jangan wrap tombol di mobile, buat mereka tetap di baris yang sama */
+        gap: 2px; /* Kurangi jarak antar tombol */
     }
     .slider-adjust-btn {
-        flex-grow: 1;
-        min-width: 30px;
+        padding: 3px 6px; /* Kurangi padding tombol */
+        font-size: 0.8em; /* Kecilkan ukuran font tombol */
+        min-width: 25px; /* Kurangi lebar minimum tombol */
     }
     input[type="range"] {
-        width: calc(100% - (40px * 4 + 20px)); /* Contoh penyesuaian untuk tombol */
+        /* Sesuaikan lebar slider agar tetap proporsional dengan tombol yang lebih kecil */
+        width: calc(100% - (25px * 4 + 10px)); /* perkiraan: 4 tombol * 25px + 2 gap * 5px */
     }
 
 
