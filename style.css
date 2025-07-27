@@ -52,12 +52,46 @@ body {
 
 header {
     background-color: var(--card-bg);
-    padding: 20px 40px;
+    padding: 15px 20px;
     box-shadow: 0 4px 8px var(--shadow);
     display: flex;
     flex-direction: column;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
+    position: relative; /* Untuk positioning tombol hamburger */
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    width: 100%; /* Memastikan logo dan hamburger di satu baris */
+    justify-content: center; /* Pusatkan di mobile */
+    position: relative;
+}
+
+.hamburger-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent !important; /* Override default button bg */
+    border: none !important; /* Override default button border */
+    color: var(--text-color) !important;
+    font-size: 1.5em;
+    padding: 10px;
+    box-shadow: none !important;
+}
+
+.hamburger-btn:hover {
+    color: var(--primary-color) !important;
+    background-color: rgba(123, 0, 255, 0.1) !important; /* Light hover */
+    transform: translateY(-50%) scale(1.05);
+}
+
+.header-theme-toggle {
+    display: none; /* Default hidden, hanya tampil di mobile header */
+    margin-top: 10px;
+    width: 100%; /* Full width di mobile */
 }
 
 .logo {
@@ -85,6 +119,7 @@ header {
     color: var(--text-color);
     opacity: 0.8;
     margin: 0;
+    text-align: center;
 }
 
 .container {
@@ -108,12 +143,44 @@ section {
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
 }
 
+/* Input Selection Tabs */
+.input-selection {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 0; /* Override section padding */
+    border: none; /* Override section border */
+    background: transparent; /* Override section background */
+    box-shadow: none; /* Override section shadow */
+}
+
+.input-tab {
+    flex: 1;
+    max-width: 200px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 12px 15px;
+}
+
+.input-tab.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 8px rgba(123, 0, 255, 0.3);
+}
+
+/* Input Sections */
 .input-controls {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
     justify-content: center;
-    align-items: flex-end; /* Align items at the bottom */
+    align-items: flex-start; /* Align items at the top for consistent look */
+}
+
+.input-controls.hidden {
+    display: none;
 }
 
 .input-group {
@@ -124,7 +191,8 @@ section {
     min-width: 120px; /* Minimum width for smaller inputs */
 }
 
-.input-group label {
+.input-group label,
+.rgba-slider-group label {
     font-size: 0.9em;
     margin-bottom: 5px;
     color: var(--text-color);
@@ -148,26 +216,6 @@ input[type="number"]:focus {
     border-color: var(--primary-color);
     outline: none;
     box-shadow: 0 0 0 3px rgba(123, 0, 255, 0.3);
-}
-
-.rgba-group {
-    display: flex;
-    flex-direction: row; /* RGBA inputs in a row */
-    align-items: flex-end; /* Align inputs themselves */
-    flex-wrap: wrap;
-    gap: 5px; /* Smaller gap between rgba inputs */
-    flex-grow: 2; /* Allow RGBA group to take more space */
-}
-
-.rgba-group label {
-    flex-basis: 100%; /* Label takes full width */
-    margin-bottom: 5px;
-}
-
-.rgba-group input {
-    flex-grow: 1;
-    min-width: 50px; /* Ensure rgba inputs don't get too small */
-    text-align: center;
 }
 
 input[type="color"] {
@@ -198,6 +246,84 @@ input[type="color"]::color-swatch {
     border: none;
     border-radius: 8px;
 }
+
+/* RGBA Sliders */
+.rgba-slider-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Each slider group takes full width */
+    margin-bottom: 10px;
+}
+
+.rgba-slider-group label {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+}
+
+input[type="range"] {
+    flex-grow: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 10px;
+    background: var(--input-bg);
+    outline: none;
+    border-radius: 5px;
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: grab;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: grab;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.slider-adjust-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.slider-adjust-btn:hover {
+    background-color: #6a00e6;
+}
+
 
 .action-btn {
     padding: 10px 18px;
@@ -233,13 +359,26 @@ input[type="color"]::color-swatch {
     justify-content: center;
 }
 
-.action-btn:not(.primary-btn) {
+.main-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 2 kolom di desktop, 1 di mobile */
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+.full-width-btn {
+    width: 100%; /* Untuk tombol "Warna Acak" di input section */
+}
+
+
+.action-btn:not(.primary-btn):not(.input-tab):not(.hamburger-btn):not(.close-side-menu-btn) {
     background-color: var(--input-bg);
     color: var(--text-color);
     border: 1px solid var(--border-color);
 }
 
-.action-btn:not(.primary-btn):hover {
+.action-btn:not(.primary-btn):not(.input-tab):not(.hamburger-btn):not(.close-side-menu-btn):hover {
     background-color: var(--primary-color);
     color: white;
     transform: translateY(-2px);
@@ -274,6 +413,7 @@ input[type="color"]::color-swatch {
     border: 3px solid var(--border-color);
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
     transition: background-color 0.3s ease;
+    cursor: pointer; /* Menandakan bisa diklik */
 }
 
 .color-meaning-text {
@@ -375,6 +515,37 @@ footer {
     text-align: center;
 }
 
+/* Full Screen Preview Modal Specifics */
+.modal.full-screen-modal {
+    background-color: transparent; /* Awalnya transparan */
+    transition: background-color 0.3s ease;
+}
+
+.modal.full-screen-modal.show {
+    background-color: rgba(0,0,0,0.9); /* Latar belakang gelap saat aktif */
+}
+
+.full-screen-modal-content {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent !important; /* Warna akan diatur langsung di body */
+}
+
+.full-screen-modal-content .close-btn {
+    top: 20px;
+    right: 20px;
+    color: white; /* Kontras dengan warna gelap */
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+
 .close-btn {
     color: var(--text-color);
     position: absolute;
@@ -469,10 +640,122 @@ footer {
     opacity: 1;
 }
 
+/* Side Menu (Hamburger Menu) */
+.side-menu {
+    height: 100%;
+    width: 0; /* Tersembunyi secara default */
+    position: fixed;
+    z-index: 1001; /* Di atas modal */
+    top: 0;
+    left: 0;
+    background-color: var(--card-bg);
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    border-right: 1px solid var(--border-color);
+}
+
+.side-menu.open {
+    width: 250px; /* Lebar saat terbuka */
+}
+
+.close-side-menu-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 2em;
+    color: var(--text-color);
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.close-side-menu-btn:hover {
+    color: var(--primary-color) !important;
+    transform: none !important;
+}
+
+.side-menu-content {
+    padding: 0 20px;
+}
+
+.side-menu-content h3 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.side-menu-item {
+    width: 100%;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+    padding-left: 15px;
+}
+
+.side-menu-overlay {
+    display: none; /* Tersembunyi secara default */
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.side-menu-overlay.active {
+    display: block;
+}
+
+
 /* Responsive adjustments */
+@media (min-width: 769px) {
+    .hamburger-btn, .header-theme-toggle {
+        display: none !important; /* Sembunyikan hamburger dan tombol tema di header untuk desktop */
+    }
+
+    header {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 20px 40px;
+    }
+
+    .header-left {
+        width: auto;
+        justify-content: flex-start;
+    }
+
+    .tagline {
+        margin-left: auto; /* Dorong tagline ke kanan */
+        text-align: right;
+    }
+
+    .footer-actions #exportPresetsBtnFooter {
+        display: flex; /* Tampilkan tombol ekspor di footer desktop */
+    }
+
+    .main-actions-grid {
+        grid-template-columns: repeat(2, 1fr); /* Tetap 2 kolom di desktop */
+    }
+}
+
 @media (max-width: 768px) {
     header {
         padding: 15px 20px;
+    }
+
+    .header-left {
+        justify-content: center; /* Pusatkan logo di mobile */
+    }
+
+    .hamburger-btn {
+        display: flex !important; /* Tampilkan hamburger di mobile */
+    }
+
+    .header-theme-toggle {
+        display: flex !important; /* Tampilkan tombol tema di header mobile */
     }
 
     .logo h1 {
@@ -485,6 +768,7 @@ footer {
 
     .tagline {
         font-size: 0.9em;
+        margin-top: 10px; /* Beri jarak dari logo */
     }
 
     .container {
@@ -503,24 +787,12 @@ footer {
         width: 100%;
     }
 
-    .rgba-group {
-        flex-direction: row; /* Keep RGBA inputs in a row */
-        flex-wrap: nowrap; /* Prevent wrapping for smaller screens */
-        justify-content: space-between;
-    }
-
-    .rgba-group input {
-        width: 22%; /* Adjust width for small screens */
-        min-width: unset;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .action-btn {
+    .full-width-btn {
         width: 100%;
+    }
+
+    .main-actions-grid {
+        grid-template-columns: 1fr; /* Satu kolom di mobile */
     }
 
     .color-preview-box {
@@ -536,6 +808,15 @@ footer {
     .footer-actions {
         width: 100%;
         justify-content: center;
+    }
+
+    .footer-actions #exportPresetsBtnFooter {
+        display: none; /* Sembunyikan tombol ekspor di footer mobile, pindah ke side menu */
+    }
+
+    .side-menu.open {
+        width: 70%; /* Lebih lebar di layar mobile */
+        max-width: 300px;
     }
 }
 

@@ -15,49 +15,90 @@
 
     <!-- Google Fonts - Poppins (atau Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <header>
-        <div class="logo">
-            <i class="fas fa-palette"></i>
-            <h1>ColorForge</h1>
+        <div class="header-left">
+            <button id="hamburgerMenuBtn" class="action-btn hamburger-btn" aria-label="Menu"><i class="fas fa-bars"></i></button>
+            <div class="logo">
+                <i class="fas fa-palette"></i>
+                <h1>ColorForge</h1>
+            </div>
         </div>
         <p class="tagline">Tempa warna sesukamu. Dari ide, menjadi visual.</p>
+        <button id="themeToggleBtn" class="action-btn footer-btn header-theme-toggle"><i class="fas fa-moon"></i> Mode Gelap</button>
     </header>
 
     <main class="container">
-        <section class="input-controls">
+        <section class="input-selection">
+            <button id="showHexPickerBtn" class="action-btn input-tab active">HEX & Picker</button>
+            <button id="showRgbaSlidersBtn" class="action-btn input-tab">RGBA Sliders</button>
+        </section>
+
+        <section id="hexPickerInputSection" class="input-controls active">
             <div class="input-group">
                 <label for="hexInput">HEX</label>
                 <input type="text" id="hexInput" placeholder="#RRGGBB" maxlength="7">
-            </div>
-            <div class="input-group rgba-group">
-                <label>RGBA</label>
-                <input type="number" id="rInput" min="0" max="255" placeholder="R">
-                <input type="number" id="gInput" min="0" max="255" placeholder="G">
-                <input type="number" id="bInput" min="0" max="255" placeholder="B">
-                <input type="number" id="aInput" min="0" max="1" step="0.01" placeholder="A">
             </div>
             <div class="input-group color-picker-group">
                 <label for="colorPicker">Pilih Warna</label>
                 <input type="color" id="colorPicker">
             </div>
-            <button id="randomizerBtn" class="action-btn primary-btn"><i class="fas fa-dice"></i> Warna Acak</button>
+            <button id="randomizerBtn" class="action-btn primary-btn full-width-btn"><i class="fas fa-dice"></i> Warna Acak</button>
         </section>
+
+        <section id="rgbaSlidersInputSection" class="input-controls hidden">
+            <div class="rgba-slider-group">
+                <label for="rSlider">Merah (R): <span id="rValue">0</span></label>
+                <div class="slider-wrapper">
+                    <button class="slider-adjust-btn" data-target="r" data-adjust="-1">-</button>
+                    <input type="range" id="rSlider" min="0" max="255" value="0">
+                    <button class="slider-adjust-btn" data-target="r" data-adjust="1">+</button>
+                </div>
+            </div>
+            <div class="rgba-slider-group">
+                <label for="gSlider">Hijau (G): <span id="gValue">0</span></label>
+                <div class="slider-wrapper">
+                    <button class="slider-adjust-btn" data-target="g" data-adjust="-1">-</button>
+                    <input type="range" id="gSlider" min="0" max="255" value="0">
+                    <button class="slider-adjust-btn" data-target="g" data-adjust="1">+</button>
+                </div>
+            </div>
+            <div class="rgba-slider-group">
+                <label for="bSlider">Biru (B): <span id="bValue">0</span></label>
+                <div class="slider-wrapper">
+                    <button class="slider-adjust-btn" data-target="b" data-adjust="-1">-</button>
+                    <input type="range" id="bSlider" min="0" max="255" value="0">
+                    <button class="slider-adjust-btn" data-target="b" data-adjust="1">+</button>
+                </div>
+            </div>
+            <div class="rgba-slider-group">
+                <label for="aSlider">Alpha (A): <span id="aValue">1.00</span></label>
+                <div class="slider-wrapper">
+                    <button class="slider-adjust-btn" data-target="a" data-adjust="-0.01">-</button>
+                    <input type="range" id="aSlider" min="0" max="1" step="0.01" value="1">
+                    <button class="slider-adjust-btn" data-target="a" data-adjust="0.01">+</button>
+                </div>
+            </div>
+            <button id="randomizerBtnSlider" class="action-btn primary-btn full-width-btn"><i class="fas fa-dice"></i> Warna Acak</button>
+        </section>
+
 
         <section class="preview-section">
             <div id="colorPreviewBox" class="color-preview-box"></div>
             <p id="colorMeaning" class="color-meaning-text"></p>
         </section>
 
-        <section class="action-buttons">
+        <section class="action-buttons main-actions-grid">
             <button id="copyHexBtn" class="action-btn copy-btn" data-clipboard-target="#hexInput"><i class="fas fa-copy"></i> Salin HEX</button>
             <button id="copyRgbaBtn" class="action-btn copy-btn" data-clipboard-target="#rgbaCombinedOutput"><i class="fas fa-copy"></i> Salin RGBA</button>
             <input type="hidden" id="rgbaCombinedOutput"> <!-- Input tersembunyi untuk clipboard.js -->
 
             <button id="savePresetBtn" class="action-btn"><i class="fas fa-save"></i> Simpan Preset</button>
-            <button id="viewPresetsBtn" class="action-btn"><i class="fas fa-folder-open"></i> Lihat Preset</button>
-            <button id="moodBoardBtn" class="action-btn"><i class="fas fa-palette"></i> Mood Board</button>
+            <!-- Tombol-tombol ini dipindahkan ke menu hamburger untuk mobile -->
             <button id="rainbowModeBtn" class="action-btn"><i class="fas fa-rainbow"></i> Mode Pelangi</button>
         </section>
     </main>
@@ -66,8 +107,8 @@
         <div class="footer-content">
             <p>&copy; 2025 ColorForge. Dibuat oleh Chris.</p>
             <div class="footer-actions">
-                <button id="themeToggleBtn" class="footer-btn"><i class="fas fa-moon"></i> Mode Gelap</button>
-                <button id="exportPresetsBtn" class="footer-btn"><i class="fas fa-file-export"></i> Ekspor Preset</button>
+                <!-- Tombol tema sekarang di header -->
+                <button id="exportPresetsBtnFooter" class="footer-btn"><i class="fas fa-file-export"></i> Ekspor Preset</button>
             </div>
         </div>
     </footer>
@@ -103,12 +144,29 @@
         </div>
     </div>
 
+    <!-- Full Screen Color Preview Modal -->
+    <div id="fullScreenPreviewModal" class="modal full-screen-modal">
+        <div class="modal-content full-screen-modal-content">
+            <span class="close-btn" id="closeFullScreenPreviewModal">&times;</span>
+            <!-- Warna akan diatur oleh JS -->
+        </div>
+    </div>
+
+    <!-- Hamburger Menu / Side Nav -->
+    <div id="sideMenu" class="side-menu">
+        <button id="closeSideMenuBtn" class="action-btn close-side-menu-btn"><i class="fas fa-times"></i></button>
+        <div class="side-menu-content">
+            <h3>Menu</h3>
+            <button id="viewPresetsBtnSide" class="action-btn side-menu-item"><i class="fas fa-folder-open"></i> Lihat Preset</button>
+            <button id="moodBoardBtnSide" class="action-btn side-menu-item"><i class="fas fa-palette"></i> Mood Board</button>
+            <button id="exportPresetsBtnSide" class="action-btn side-menu-item"><i class="fas fa-file-export"></i> Ekspor Preset</button>
+        </div>
+    </div>
+    <div id="sideMenuOverlay" class="side-menu-overlay"></div>
+
 
     <!-- Library JavaScript (CDN) -->
-    <!-- tinycolor2 CDN Dihapus - Sekarang penanganan warna dilakukan secara manual di script.js -->
-    <!-- clipboard.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
-    <!-- howler.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     
     <!-- Custom JavaScript, ini harus dimuat setelah semua library CDN -->

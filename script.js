@@ -1,23 +1,46 @@
 // Menginisialisasi variabel global untuk elemen DOM dan status aplikasi
 const hexInput = document.getElementById('hexInput');
-const rInput = document.getElementById('rInput');
-const gInput = document.getElementById('gInput');
-const bInput = document.getElementById('bInput');
-const aInput = document.getElementById('aInput');
+const rSlider = document.getElementById('rSlider');
+const gSlider = document.getElementById('gSlider');
+const bSlider = document.getElementById('bSlider');
+const aSlider = document.getElementById('aSlider');
+
+// Menampilkan nilai slider secara real-time
+const rValue = document.getElementById('rValue');
+const gValue = document.getElementById('gValue');
+const bValue = document.getElementById('bValue');
+const aValue = document.getElementById('aValue');
+
 const colorPicker = document.getElementById('colorPicker');
 const colorPreviewBox = document.getElementById('colorPreviewBox');
 const rgbaCombinedOutput = document.getElementById('rgbaCombinedOutput'); // Untuk clipboard.js
 const colorMeaningText = document.getElementById('colorMeaning');
 
-const randomizerBtn = document.getElementById('randomizerBtn');
+const randomizerBtn = document.getElementById('randomizerBtn'); // Tombol randomizer untuk HEX/Picker
+const randomizerBtnSlider = document.getElementById('randomizerBtnSlider'); // Tombol randomizer untuk Slider
+
 const copyHexBtn = document.getElementById('copyHexBtn');
 const copyRgbaBtn = document.getElementById('copyRgbaBtn');
 const savePresetBtn = document.getElementById('savePresetBtn');
-const viewPresetsBtn = document.getElementById('viewPresetsBtn');
-const moodBoardBtn = document.getElementById('moodBoardBtn');
 const rainbowModeBtn = document.getElementById('rainbowModeBtn');
-const exportPresetsBtn = document.getElementById('exportPresetsBtn');
-const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+// Tombol dan elemen untuk Input View Modes
+const showHexPickerBtn = document.getElementById('showHexPickerBtn');
+const showRgbaSlidersBtn = document.getElementById('showRgbaSlidersBtn');
+const hexPickerInputSection = document.getElementById('hexPickerInputSection');
+const rgbaSlidersInputSection = document.getElementById('rgbaSlidersInputSection');
+
+// Tombol dan elemen Hamburger Menu
+const hamburgerMenuBtn = document.getElementById('hamburgerMenuBtn');
+const sideMenu = document.getElementById('sideMenu');
+const closeSideMenuBtn = document.getElementById('closeSideMenuBtn');
+const sideMenuOverlay = document.getElementById('sideMenuOverlay');
+const viewPresetsBtnSide = document.getElementById('viewPresetsBtnSide');
+const moodBoardBtnSide = document.getElementById('moodBoardBtnSide');
+const exportPresetsBtnSide = document.getElementById('exportPresetsBtnSide');
+// Tombol ekspor di footer (untuk desktop)
+const exportPresetsBtnFooter = document.getElementById('exportPresetsBtnFooter');
+
 
 // Modals
 const messageModal = document.getElementById('messageModal');
@@ -31,6 +54,9 @@ const closePresetsModal = document.getElementById('closePresetsModal');
 const moodBoardModal = document.getElementById('moodBoardModal');
 const moodBoardColors = document.getElementById('moodBoardColors');
 const closeMoodBoardModal = document.getElementById('closeMoodBoardModal');
+
+const fullScreenPreviewModal = document.getElementById('fullScreenPreviewModal');
+const closeFullScreenPreviewModal = document.getElementById('closeFullScreenPreviewModal');
 
 
 // Variabel state aplikasi
@@ -49,9 +75,7 @@ const BEEP_SOUND_BASE64 = 'data:audio/wav;base64,UklGRmUAAABXQVZFZm10IBIAAAABAAE
                          'ABAAAAAQAAABQABAAAAAQAAABAAAEAAAgAAAAAABAAAAAQAAAAAAAABAAAAAAACAAAAAAQABAFAAEAABAAABAAAAAQAAAEAAAgAAAAAABQABAAAAAQAAABAA' +
                          'AAQAAABQABAAAAAQAAABAAAEAAAgAAAAAABAAAAAQAAAAAAAABAAAAAAACAAAAAAQABAFAAEAABAAABAAAAAQAAAEAAAgAAAAAABQABAAAAAQAAABAAAAAQAAAB' +
                          'QABAAAAAQAAABAAAEAAAgAAAAAABAAAAAQAAAAAAAABAAAAAAACAAAAAAQABAFAAEAABAAABAAAAAQAAAEAAAgAAAAAABQABAAAAAQAAABAAAAAQAAABQABAAAA' +
-                         'AQAAABAAAEAAAgAAAAAABAAAAAQAAAAAAAABAAAAAAACAAAAAAQABAFAAEAABAAABAAAAAQAAAEAAAgAAAAAABQABAAAAAQAAABAAAAAQAAABQABAAAAAQAAAB' +
-                         'AAAEAAAgAAAAAABAAAAAQAAAAAAAABAAAAAAACAAAAAAQABAFAAEAABAAABAAAAAQAAAEAAAgAAAAAABQABAAAAAQAAABAAAAAQAAABQABAAAAAQAAABAAAEAA' +
-                         'AgAAAAAABAAAAAQAAAAAAAABAAAAAAACAAAAAAQABAFAAEAABAAABAAAAAQAAAEAAAgAAAAAABQABA';
+                         'AQAAABAAAEAAAgAAAAAABAAAAAQAAAAAAAABAAAAAAACAAAAAAQABAFAAEAABAAABAAAAAQAAAEAAAgAAAAAABQABA';
 
 const colorSound = new Howl({
     src: [BEEP_SOUND_BASE64],
@@ -107,8 +131,8 @@ function hexToRgba(hex) {
  * @returns {string} - String RGBA (rgba(r, g, b, a)).
  */
 function rgbaToString({ r, g, b, a }) {
-    // Perbaikan: Menghapus kelebihan tanda kurung di parseFloat(a.toFixed(2)))
-    return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${parseFloat(a.toFixed(2))})`;
+    // Memastikan alpha hanya memiliki 2 angka di belakang koma untuk konsistensi
+    return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a.toFixed(2)})`;
 }
 
 /**
@@ -196,8 +220,9 @@ function getHueFromRgba({ r, g, b }) {
  * Memperbarui tampilan UI (input HEX, RGBA, color picker, preview box)
  * berdasarkan warna baru yang diberikan.
  * @param {string|object} colorInput - Warna dalam format HEX string (#RRGGBB) atau objek RGBA {r, g, b, a}.
+ * @param {boolean} [silent=false] - Jika true, tidak akan memutar suara atau menampilkan pesan.
  */
-function updateColor(colorInput) {
+function updateColor(colorInput, silent = false) {
     let rgbaObj = {};
     let hexString = '';
 
@@ -205,14 +230,14 @@ function updateColor(colorInput) {
         if (colorInput.startsWith('#')) { // Jika HEX
             rgbaObj = hexToRgba(colorInput);
             if (!rgbaObj) { // Jika HEX tidak valid
-                showMessage('Format HEX tidak valid. Gunakan #RRGGBB.', 'error');
+                if (!silent) showMessage('Format HEX tidak valid. Gunakan #RRGGBB.', 'error');
                 return;
             }
             hexString = colorInput;
         } else if (colorInput.startsWith('rgba')) { // Jika RGBA string
             const parts = colorInput.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)/);
             if (!parts) {
-                showMessage('Format RGBA tidak valid. Gunakan rgba(r,g,b,a).', 'error');
+                if (!silent) showMessage('Format RGBA tidak valid. Gunakan rgba(r,g,b,a).', 'error');
                 return;
             }
             rgbaObj = {
@@ -230,7 +255,7 @@ function updateColor(colorInput) {
         } else { // Coba sebagai HEX tanpa #
             rgbaObj = hexToRgba('#' + colorInput);
             if (!rgbaObj) {
-                showMessage('Warna tidak valid. Masukkan format HEX (#RRGGBB) atau RGBA (0-255) yang benar.', 'error');
+                if (!silent) showMessage('Warna tidak valid. Masukkan format HEX (#RRGGBB) atau RGBA (0-255) yang benar.', 'error');
                 return;
             }
             hexString = '#' + colorInput;
@@ -244,20 +269,26 @@ function updateColor(colorInput) {
         rgbaObj.a = Math.max(0, Math.min(1, rgbaObj.a));
         hexString = rgbaToHex(rgbaObj);
     } else {
-        showMessage('Input warna tidak dikenali.', 'error');
+        if (!silent) showMessage('Input warna tidak dikenali.', 'error');
         return;
     }
 
     currentColor = rgbaObj; // Perbarui variabel warna saat ini
     const rgbaString = rgbaToString(currentColor);
 
-    // Perbarui input HEX, RGBA, dan color picker
+    // Perbarui input HEX, RGBA slider, dan color picker
     hexInput.value = hexString;
-    rInput.value = currentColor.r;
-    gInput.value = currentColor.g;
-    bInput.value = currentColor.b;
-    aInput.value = currentColor.a.toFixed(2); // Bulatkan alpha ke 2 desimal
     colorPicker.value = hexString; // Color picker hanya menerima HEX
+
+    rSlider.value = currentColor.r;
+    gSlider.value = currentColor.g;
+    bSlider.value = currentColor.b;
+    aSlider.value = currentColor.a.toFixed(2); // Bulatkan alpha ke 2 desimal
+
+    rValue.textContent = Math.round(currentColor.r);
+    gValue.textContent = Math.round(currentColor.g);
+    bValue.textContent = Math.round(currentColor.b);
+    aValue.textContent = currentColor.a.toFixed(2);
 
     // Perbarui kotak preview warna
     colorPreviewBox.style.backgroundColor = rgbaString;
@@ -266,7 +297,7 @@ function updateColor(colorInput) {
     // Panggil fitur tambahan
     updateAutoMode();
     updateColorMeaning();
-    playColorSound();
+    if (!silent) playColorSound();
 }
 
 /**
@@ -320,6 +351,7 @@ function updateAutoMode() {
 /**
  * Mengubah tema secara manual (toggle dark/light mode).
  */
+const themeToggleBtn = document.getElementById('themeToggleBtn');
 function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     isDarkMode = document.body.classList.contains('dark-mode');
@@ -341,25 +373,25 @@ function updateColorMeaning() {
     let meaning = "Eksplorasi warna tanpa batas!";
 
     if (hex === "#000000") {
-        meaning = "Hitam: Keanggunan, kekuatan, misteri.";
+        meaning = "Hitam: Keanggunan, kekuatan, misteri. Dalam desain, hitam sering digunakan untuk menciptakan kesan mewah atau modern.";
     } else if (hex === "#ffffff") {
-        meaning = "Putih: Kemurnian, kesederhanaan, kedamaian.";
+        meaning = "Putih: Kemurnian, kesederhanaan, kedamaian. Memberikan kesan ruang terbuka dan kejelasan.";
     } else if (currentColor.a < 0.2) {
-        meaning = "Transparan: Ringan, tidak terlihat, kosong.";
+        meaning = "Transparan: Ringan, tidak terlihat, kosong. Digunakan untuk efek lapisan atau 'ghosting'.";
     } else if (hue >= 345 || hue < 15) { // Merah
-        meaning = "Merah: Energi, semangat, cinta, bahaya.";
+        meaning = "Merah: Energi, semangat, cinta, bahaya. Warna yang menarik perhatian, sering digunakan untuk tombol aksi atau peringatan.";
     } else if (hue >= 15 && hue < 45) { // Oranye
-        meaning = "Oranye: Kreativitas, antusiasme, keceriaan.";
+        meaning = "Oranye: Kreativitas, antusiasme, keceriaan. Menggabungkan energi merah dengan kebahagiaan kuning, sering digunakan untuk branding yang ramah.";
     } else if (hue >= 45 && hue < 75) { // Kuning
-        meaning = "Kuning: Optimisme, kebahagiaan, kecerdasan.";
+        meaning = "Kuning: Optimisme, kebahagiaan, kecerdasan. Warna cerah yang dapat meningkatkan mood, namun berhati-hatilah agar tidak terlalu terang.";
     } else if (hue >= 75 && hue < 165) { // Hijau
-        meaning = "Hijau: Alam, pertumbuhan, kesegaran, ketenangan.";
+        meaning = "Hijau: Alam, pertumbuhan, kesegaran, ketenangan. Sering dikaitkan dengan kesehatan, keberlanjutan, dan relaksasi.";
     } else if (hue >= 165 && hue < 255) { // Biru
-        meaning = "Biru: Ketenangan, kepercayaan, stabilitas, kebijaksanaan.";
+        meaning = "Biru: Ketenangan, kepercayaan, stabilitas, kebijaksanaan. Populer untuk bisnis dan teknologi karena memberikan kesan profesional dan dapat diandalkan.";
     } else if (hue >= 255 && hue < 285) { // Ungu
-        meaning = "Kemewahan, spiritualitas, misteri, kebijaksanaan.";
+        meaning = "Ungu: Kemewahan, spiritualitas, misteri, kebijaksanaan. Sering diasosiasikan dengan royalti dan kreativitas.";
     } else if (hue >= 285 && hue < 345) { // Magenta/Pink
-        meaning = "Romansa, feminin, kelembutan, keceriaan.";
+        meaning = "Magenta/Pink: Romansa, feminin, kelembutan, keceriaan. Memiliki spektrum yang luas dari yang lembut hingga yang berani.";
     }
 
     colorMeaningText.textContent = meaning;
@@ -381,42 +413,21 @@ function initializeApp() {
     }
 
     // Set warna awal dan perbarui UI
-    updateColor(rgbaToHex(currentColor)); // Inisialisasi dengan warna default
+    updateColor(rgbaToHex(currentColor), true); // Inisialisasi dengan warna default, silent untuk menghindari suara awal
 }
+
+// --- Event Listeners ---
 
 /**
  * Menangani input HEX.
  */
 hexInput.addEventListener('keyup', (e) => {
     const hex = e.target.value;
-    const rgba = hexToRgba(hex);
-    if (rgba) { // Cek apakah HEX valid
-        updateColor(rgba);
+    // Hanya perbarui jika input HEX memiliki panjang yang valid untuk konversi
+    if (hex.length === 7 || hex.length === 6) { // #RRGGBB atau RRGGBB
+        updateColor(hex);
     }
 });
-
-/**
- * Menangani input RGBA.
- */
-function handleRgbaInput() {
-    const r = parseInt(rInput.value || 0);
-    const g = parseInt(gInput.value || 0);
-    const b = parseInt(bInput.value || 0);
-    const a = parseFloat(aInput.value || 1);
-
-    const newRgba = {
-        r: Math.max(0, Math.min(255, r)),
-        g: Math.max(0, Math.min(255, g)),
-        b: Math.max(0, Math.min(255, b)),
-        a: Math.max(0, Math.min(1, a))
-    };
-    updateColor(newRgba);
-}
-
-rInput.addEventListener('input', handleRgbaInput);
-gInput.addEventListener('input', handleRgbaInput);
-bInput.addEventListener('input', handleRgbaInput);
-aInput.addEventListener('input', handleRgbaInput);
 
 /**
  * Menangani input dari color picker.
@@ -426,16 +437,71 @@ colorPicker.addEventListener('input', (e) => {
 });
 
 /**
- * Menghasilkan warna acak.
+ * Menangani input dari RGBA sliders.
  */
-randomizerBtn.addEventListener('click', () => {
+function handleRgbaSliderInput() {
+    const r = parseInt(rSlider.value);
+    const g = parseInt(gSlider.value);
+    const b = parseInt(bSlider.value);
+    const a = parseFloat(aSlider.value);
+
+    // Perbarui tampilan nilai angka
+    rValue.textContent = r;
+    gValue.textContent = g;
+    bValue.textContent = b;
+    aValue.textContent = a.toFixed(2);
+
+    updateColor({ r, g, b, a });
+}
+
+rSlider.addEventListener('input', handleRgbaSliderInput);
+gSlider.addEventListener('input', handleRgbaSliderInput);
+bSlider.addEventListener('input', handleRgbaSliderInput);
+aSlider.addEventListener('input', handleRgbaSliderInput);
+
+// Tombol penyesuaian slider +/-
+document.querySelectorAll('.slider-adjust-btn').forEach(button => {
+    button.addEventListener('click', (e) => {
+        const target = e.target.dataset.target; // r, g, b, atau a
+        const adjust = parseFloat(e.target.dataset.adjust); // +1, -1, +0.01, -0.01
+        let currentValue;
+        let sliderElement;
+
+        if (target === 'r') { currentValue = parseInt(rSlider.value); sliderElement = rSlider; }
+        else if (target === 'g') { currentValue = parseInt(gSlider.value); sliderElement = gSlider; }
+        else if (target === 'b') { currentValue = parseInt(bSlider.value); sliderElement = bSlider; }
+        else if (target === 'a') { currentValue = parseFloat(aSlider.value); sliderElement = aSlider; }
+
+        let newValue = currentValue + adjust;
+
+        // Batasi nilai sesuai min/max slider
+        if (target === 'a') {
+            newValue = Math.max(0, Math.min(1, newValue));
+        } else {
+            newValue = Math.max(0, Math.min(255, newValue));
+        }
+
+        sliderElement.value = newValue;
+        handleRgbaSliderInput(); // Perbarui warna berdasarkan nilai baru
+    });
+});
+
+
+/**
+ * Menghasilkan warna acak (untuk kedua tombol).
+ */
+const generateRandomColor = () => {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
     const a = 1; // Alpha penuh
     updateColor({ r, g, b, a });
     showMessage('Warna acak baru tercipta! ✨', 'info');
-});
+};
+
+randomizerBtn.addEventListener('click', generateRandomColor);
+randomizerBtnSlider.addEventListener('click', generateRandomColor);
+
 
 /**
  * Mengatur ClipboardJS untuk tombol salin.
@@ -467,7 +533,6 @@ savePresetBtn.addEventListener('click', () => {
         savedColors.push(hex);
         localStorage.setItem('colorForgePresets', JSON.stringify(savedColors));
         showMessage(`Warna ${hex} disimpan ke preset!`, 'success');
-        displayPresets(); // Perbarui tampilan preset
     } else {
         showMessage(`Warna ${hex} sudah ada di preset.`, 'info');
     }
@@ -476,9 +541,10 @@ savePresetBtn.addEventListener('click', () => {
 /**
  * Menampilkan preset warna yang tersimpan di modal.
  */
-viewPresetsBtn.addEventListener('click', () => {
+viewPresetsBtnSide.addEventListener('click', () => {
     displayPresets(); // Pastikan tampilan diperbarui setiap kali dibuka
     presetsModal.classList.add('show');
+    closeSideMenu(); // Tutup side menu setelah membuka modal
 });
 
 /**
@@ -512,7 +578,10 @@ function displayPresets() {
         deleteBtn.classList.add('delete-preset-btn');
         deleteBtn.innerHTML = '&times;';
         deleteBtn.title = 'Hapus preset ini';
-        deleteBtn.addEventListener('click', () => deletePreset(index));
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Mencegah klik pada colorBox
+            deletePreset(index);
+        });
 
         presetItem.appendChild(colorBox);
         presetItem.appendChild(colorText);
@@ -526,6 +595,7 @@ function displayPresets() {
  * @param {number} index - Indeks preset yang akan dihapus.
  */
 function deletePreset(index) {
+    // Mengganti confirm() dengan modal kustom jika diinginkan
     if (confirm('Apakah Anda yakin ingin menghapus preset ini?')) {
         savedColors.splice(index, 1);
         localStorage.setItem('colorForgePresets', JSON.stringify(savedColors));
@@ -549,7 +619,7 @@ rainbowModeBtn.addEventListener('click', () => {
         rainbowInterval = setInterval(() => {
             h = (h + 1) % 360; // Siklus hue dari 0 ke 359
             const newRgb = hslToRgb(h, s, l);
-            updateColor({ r: newRgb.r, g: newRgb.g, b: newRgb.b, a: currentColor.a });
+            updateColor({ r: newRgb.r, g: newRgb.g, b: newRgb.b, a: currentColor.a }, true); // Silent update
         }, 50); // Ubah setiap 50ms
         isRainbowModeActive = true;
         rainbowModeBtn.classList.add('active');
@@ -561,7 +631,7 @@ rainbowModeBtn.addEventListener('click', () => {
 /**
  * Menghasilkan dan menampilkan palet mood board.
  */
-moodBoardBtn.addEventListener('click', () => {
+moodBoardBtnSide.addEventListener('click', () => {
     moodBoardColors.innerHTML = ''; // Kosongkan kontainer
 
     const currentHsl = rgbToHsl(currentColor.r, currentColor.g, currentColor.b);
@@ -656,12 +726,13 @@ moodBoardBtn.addEventListener('click', () => {
     });
 
     moodBoardModal.classList.add('show');
+    closeSideMenu(); // Tutup side menu setelah membuka modal
 });
 
 /**
  * Mengekspor preset yang tersimpan ke file JSON.
  */
-exportPresetsBtn.addEventListener('click', () => {
+const exportPresets = () => {
     if (savedColors.length === 0) {
         showMessage('Tidak ada preset untuk diekspor.', 'info');
         return;
@@ -678,12 +749,65 @@ exportPresetsBtn.addEventListener('click', () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showMessage('Preset berhasil diekspor ke colorforge_presets.json!', 'success');
+};
+
+exportPresetsBtnSide.addEventListener('click', () => {
+    exportPresets();
+    closeSideMenu(); // Tutup side menu setelah aksi
 });
+exportPresetsBtnFooter.addEventListener('click', exportPresets); // Untuk tombol di footer desktop
 
 /**
  * Toggle tema gelap/terang secara manual.
  */
 themeToggleBtn.addEventListener('click', toggleTheme);
+
+// --- Mode Tampilan Input ---
+showHexPickerBtn.addEventListener('click', () => {
+    hexPickerInputSection.classList.add('active');
+    hexPickerInputSection.classList.remove('hidden');
+    rgbaSlidersInputSection.classList.remove('active');
+    rgbaSlidersInputSection.classList.add('hidden');
+
+    showHexPickerBtn.classList.add('active');
+    showRgbaSlidersBtn.classList.remove('active');
+});
+
+showRgbaSlidersBtn.addEventListener('click', () => {
+    hexPickerInputSection.classList.remove('active');
+    hexPickerInputSection.classList.add('hidden');
+    rgbaSlidersInputSection.classList.add('active');
+    rgbaSlidersInputSection.classList.remove('hidden');
+
+    showHexPickerBtn.classList.remove('active');
+    showRgbaSlidersBtn.classList.add('active');
+});
+
+// --- Full Screen Color Preview ---
+colorPreviewBox.addEventListener('click', () => {
+    fullScreenPreviewModal.classList.add('show');
+    // Set warna latar belakang modal sesuai currentColor
+    fullScreenPreviewModal.querySelector('.modal-content').style.backgroundColor = rgbaToString(currentColor);
+});
+
+closeFullScreenPreviewModal.addEventListener('click', () => {
+    fullScreenPreviewModal.classList.remove('show');
+});
+
+// --- Hamburger Menu ---
+hamburgerMenuBtn.addEventListener('click', () => {
+    sideMenu.classList.add('open');
+    sideMenuOverlay.classList.add('active');
+});
+
+closeSideMenuBtn.addEventListener('click', closeSideMenu);
+sideMenuOverlay.addEventListener('click', closeSideMenu);
+
+function closeSideMenu() {
+    sideMenu.classList.remove('open');
+    sideMenuOverlay.classList.remove('active');
+}
+
 
 // Listener untuk menutup modal
 closeMessageModal.addEventListener('click', () => messageModal.classList.remove('show'));
@@ -701,9 +825,28 @@ window.addEventListener('click', (event) => {
     if (event.target === moodBoardModal) {
         moodBoardModal.classList.remove('show');
     }
+    if (event.target === fullScreenPreviewModal) { // Menangani klik di luar modal preview
+        fullScreenPreviewModal.classList.remove('show');
+    }
 });
 
 // Panggil fungsi inisialisasi aplikasi saat DOM sudah sepenuhnya dimuat.
 // Ini adalah pendekatan terbaik karena semua elemen DOM sudah ada
 // dan kita tidak bergantung pada library eksternal yang mungkin memakan waktu.
 window.addEventListener('DOMContentLoaded', initializeApp);
+
+
+// --- PWA Service Worker Registration ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // Sesuaikan jalur service-worker.js jika aplikasi Anda di-deploy di sub-direktori
+        // Contoh: /nama-subfolder-repo/service-worker.js
+        navigator.serviceWorker.register('/rgb-hex/RGB-Hex-7bedd7301005b9f4c3e28f6f8eecdb56cd37ee38/service-worker.js')
+            .then((registration) => {
+                console.log('Service Worker terdaftar dengan scope:', registration.scope);
+            })
+            .catch((error) => {
+                console.error('Pendaftaran Service Worker gagal:', error);
+            });
+    });
+}
