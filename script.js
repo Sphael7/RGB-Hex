@@ -58,6 +58,13 @@ const closeMoodBoardModal = document.getElementById('closeMoodBoardModal');
 const fullScreenPreviewModal = document.getElementById('fullScreenPreviewModal');
 const closeFullScreenPreviewModal = document.getElementById('closeFullScreenPreviewModal');
 
+// Elemen untuk Modal Konfirmasi Kustom
+const confirmModal = document.getElementById('confirmModal');
+const confirmMessageText = document.getElementById('confirmMessageText');
+const closeConfirmModal = document.getElementById('closeConfirmModal');
+const confirmYesBtn = document.getElementById('confirmYesBtn');
+const confirmNoBtn = document.getElementById('confirmNoBtn');
+
 
 // Variabel state aplikasi
 let currentColor = { r: 106, g: 13, b: 173, a: 1, format: 'rgba' }; // Default color: #6a0dad
@@ -66,7 +73,7 @@ let rainbowInterval = null; // Untuk mengontrol mode pelangi
 let isRainbowModeActive = false; // Status mode pelangi
 let isDarkMode = false; // Status tema gelap/terang
 
-// --- PENTING: BASE_PATH TELAH Disesuaikan untuk domain root (rgb-hex-bay.vercel.app) ---
+// --- PENTING: BASE_PATH Disesuaikan untuk domain root (rgb-hex-bay.vercel.app) ---
 // Karena URL Anda adalah rgb-hex-bay.vercel.app, BASE_PATH harus '/'
 const BASE_PATH = '/';
 // PASTIKAN ADA GARIS MIRING (/) DI AWAL DAN AKHIR JALUR!
@@ -597,18 +604,35 @@ function displayPresets() {
     });
 }
 
+// Global variable for confirm callback
+let confirmCallback = null;
+
+/**
+ * Menampilkan modal konfirmasi kustom.
+ * @param {string} message - Pesan yang akan ditampilkan.
+ * @param {function} callback - Fungsi yang akan dipanggil dengan true/false berdasarkan pilihan pengguna.
+ */
+function showConfirmModal(message, callback) {
+    confirmMessageText.textContent = message;
+    confirmCallback = callback;
+    confirmModal.classList.add('show');
+}
+
 /**
  * Menghapus preset warna berdasarkan indeks.
  * @param {number} index - Indeks preset yang akan dihapus.
  */
 function deletePreset(index) {
-    // Mengganti confirm() dengan modal kustom jika diinginkan
-    if (confirm('Apakah Anda yakin ingin menghapus preset ini?')) {
-        savedColors.splice(index, 1);
-        localStorage.setItem('colorForgePresets', JSON.stringify(savedColors));
-        showMessage('Preset berhasil dihapus.', 'success');
-        displayPresets(); // Perbarui tampilan
-    }
+    showConfirmModal('Apakah Anda yakin ingin menghapus preset ini?', (confirmed) => {
+        if (confirmed) {
+            savedColors.splice(index, 1);
+            localStorage.setItem('colorForgePresets', JSON.stringify(savedColors));
+            showMessage('Preset berhasil dihapus.', 'success');
+            displayPresets(); // Perbarui tampilan
+        } else {
+            showMessage('Penghapusan preset dibatalkan.', 'info');
+        }
+    });
 }
 
 /**
@@ -835,7 +859,41 @@ window.addEventListener('click', (event) => {
     if (event.target === fullScreenPreviewModal) { // Menangani klik di luar modal preview
         fullScreenPreviewModal.classList.remove('show');
     }
+    // Tambahkan listener untuk modal konfirmasi
+    if (event.target === confirmModal) {
+        confirmModal.classList.remove('show');
+        if (confirmCallback) {
+            confirmCallback(false); // Asumsikan "Tidak" jika ditutup dengan mengklik di luar
+        }
+        confirmCallback = null;
+    }
 });
+
+// Event Listeners for confirm modal buttons
+confirmYesBtn.addEventListener('click', () => {
+    confirmModal.classList.remove('show');
+    if (confirmCallback) {
+        confirmCallback(true);
+    }
+    confirmCallback = null; // Reset callback
+});
+
+confirmNoBtn.addEventListener('click', () => {
+    confirmModal.classList.remove('show');
+    if (confirmCallback) {
+        confirmCallback(false);
+    }
+    confirmCallback = null; // Reset callback
+});
+
+closeConfirmModal.addEventListener('click', () => {
+    confirmModal.classList.remove('show');
+    if (confirmCallback) {
+        confirmCallback(false); // Assume "No" if closed via X button
+    }
+    confirmCallback = null;
+});
+
 
 // Panggil fungsi inisialisasi aplikasi saat DOM sudah sepenuhnya dimuat.
 // Ini adalah pendekatan terbaik karena semua elemen DOM sudah ada

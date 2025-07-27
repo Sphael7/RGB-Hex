@@ -659,6 +659,16 @@ footer {
     margin-bottom: 15px;
 }
 
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+.confirm-actions .action-btn {
+    flex-grow: 1;
+    max-width: 120px;
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -712,11 +722,11 @@ footer {
     .input-controls {
         flex-direction: column;
         align-items: stretch;
-    }
-
-    .input-group {
-        flex-basis: auto;
-        width: 100%;
+        /* PENYESUAIAN UTAMA UNTUK MOBILE FRIENDLY RGBA */
+        max-height: 350px; /* Batasi tinggi input controls */
+        overflow-y: auto; /* Aktifkan scroll vertikal jika konten melebihi max-height */
+        -webkit-overflow-scrolling: touch; /* Meningkatkan scrolling di iOS */
+        padding-bottom: 15px; /* Tambahkan padding agar tidak terlalu mepet dengan scrollbar */
     }
 
     .slider-with-buttons {
