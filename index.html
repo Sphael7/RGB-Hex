@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorForge - Tempa Warna Sesukamu</title>
+    <!-- Favicon (Opsional, bisa pakai emoji atau SVG kecil) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+
+    <!-- CSS Font Awesome (untuk ikon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Fonts - Poppins (atau Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-palette"></i>
+            <h1>ColorForge</h1>
+        </div>
+        <p class="tagline">Tempa warna sesukamu. Dari ide, menjadi visual.</p>
+    </header>
+
+    <main class="container">
+        <section class="input-controls">
+            <div class="input-group">
+                <label for="hexInput">HEX</label>
+                <input type="text" id="hexInput" placeholder="#RRGGBB" maxlength="7">
+            </div>
+            <div class="input-group rgba-group">
+                <label>RGBA</label>
+                <input type="number" id="rInput" min="0" max="255" placeholder="R">
+                <input type="number" id="gInput" min="0" max="255" placeholder="G">
+                <input type="number" id="bInput" min="0" max="255" placeholder="B">
+                <input type="number" id="aInput" min="0" max="1" step="0.01" placeholder="A">
+            </div>
+            <div class="input-group color-picker-group">
+                <label for="colorPicker">Pilih Warna</label>
+                <input type="color" id="colorPicker">
+            </div>
+            <button id="randomizerBtn" class="action-btn primary-btn"><i class="fas fa-dice"></i> Warna Acak</button>
+        </section>
+
+        <section class="preview-section">
+            <div id="colorPreviewBox" class="color-preview-box"></div>
+            <p id="colorMeaning" class="color-meaning-text"></p>
+        </section>
+
+        <section class="action-buttons">
+            <button id="copyHexBtn" class="action-btn copy-btn" data-clipboard-target="#hexInput"><i class="fas fa-copy"></i> Salin HEX</button>
+            <button id="copyRgbaBtn" class="action-btn copy-btn" data-clipboard-target="#rgbaCombinedOutput"><i class="fas fa-copy"></i> Salin RGBA</button>
+            <input type="hidden" id="rgbaCombinedOutput"> <!-- Input tersembunyi untuk clipboard.js -->
+
+            <button id="savePresetBtn" class="action-btn"><i class="fas fa-save"></i> Simpan Preset</button>
+            <button id="viewPresetsBtn" class="action-btn"><i class="fas fa-folder-open"></i> Lihat Preset</button>
+            <button id="moodBoardBtn" class="action-btn"><i class="fas fa-palette"></i> Mood Board</button>
+            <button id="rainbowModeBtn" class="action-btn"><i class="fas fa-rainbow"></i> Mode Pelangi</button>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 ColorForge. Dibuat dengan ✨ oleh AI.</p>
+            <div class="footer-actions">
+                <button id="themeToggleBtn" class="footer-btn"><i class="fas fa-moon"></i> Mode Gelap</button>
+                <button id="exportPresetsBtn" class="footer-btn"><i class="fas fa-file-export"></i> Ekspor Preset</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content small-modal">
+            <span class="close-btn" id="closeMessageModal">&times;</span>
+            <p id="messageText"></p>
+        </div>
+    </div>
+
+    <!-- Presets Modal -->
+    <div id="presetsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closePresetsModal">&times;</span>
+            <h2>Preset Tersimpan</h2>
+            <div id="savedPresetsContainer" class="presets-grid">
+                <!-- Preset akan dimuat di sini oleh JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mood Board Modal -->
+    <div id="moodBoardModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeMoodBoardModal">&times;</span>
+            <h2>Mood Board Warna</h2>
+            <div id="moodBoardColors" class="mood-board-grid">
+                <!-- Palet warna akan dimuat di sini oleh JS -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Library JavaScript (CDN) -->
+    <!-- tinycolor2 CDN Dihapus - Sekarang penanganan warna dilakukan secara manual di script.js -->
+    <!-- clipboard.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+    <!-- howler.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    
+    <!-- Custom JavaScript, ini harus dimuat setelah semua library CDN -->
+    <script src="script.js"></script>
+</body>
+</html>
