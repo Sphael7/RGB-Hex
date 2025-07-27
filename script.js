@@ -34,7 +34,7 @@ const rgbaSlidersInputSection = document.getElementById('rgbaSlidersInputSection
 const hamburgerMenuBtn = document.getElementById('hamburgerMenuBtn');
 const sideMenu = document.getElementById('sideMenu');
 const closeSideMenuBtn = document.getElementById('closeSideMenuBtn');
-const sideMenuOverlay = document.getElementById('sideMenuOverlay');
+const sideMenuOverlay = document="sideMenuOverlay";
 const viewPresetsBtnSide = document.getElementById('viewPresetsBtnSide');
 const moodBoardBtnSide = document.getElementById('moodBoardBtnSide');
 const exportPresetsBtnSide = document.getElementById('exportPresetsBtnSide');
@@ -65,6 +65,17 @@ let savedColors = []; // Array untuk menyimpan preset warna
 let rainbowInterval = null; // Untuk mengontrol mode pelangi
 let isRainbowModeActive = false; // Status mode pelangi
 let isDarkMode = false; // Status tema gelap/terang
+
+// --- PENTING: SESUAIKAN BASE_PATH INI ---
+// Ganti nilai ini dengan jalur (path) folder proyek Anda di server,
+// dimulai dari akar domain.
+// Contoh: Jika aplikasi Anda diakses di `https://namadomain.com/my-app/index.html`,
+// maka BASE_PATH adalah '/my-app/'.
+// Berdasarkan file yang Anda berikan, kemungkinan seperti ini:
+const BASE_PATH = '/rgb-hex/RGB-Hex-7bedd7301005b9f4c3e28f6f8eecdb56cd37ee38/';
+// Jika aplikasi Anda langsung di akar domain (misal: https://namadomain.com/index.html),
+// maka gunakan: const BASE_PATH = '/';
+
 
 // Inisialisasi suara menggunakan howler.js
 // Base64 encoded WAV file for a simple beep sound
@@ -351,10 +362,11 @@ function updateAutoMode() {
 /**
  * Mengubah tema secara manual (toggle dark/light mode).
  */
-const themeToggleBtn = document.getElementById('themeToggleBtn');
+const themeToggleBtn = document.getElementById('themeToggleBtn'); // Deklarasi ini tetap di sini
 function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     isDarkMode = document.body.classList.contains('dark-mode');
+    // Tidak perlu 'const' lagi di sini
     themeToggleBtn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i> Mode Terang' : '<i class="fas fa-moon"></i> Mode Gelap';
 }
 
@@ -839,9 +851,8 @@ window.addEventListener('DOMContentLoaded', initializeApp);
 // --- PWA Service Worker Registration ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        // Sesuaikan jalur service-worker.js jika aplikasi Anda di-deploy di sub-direktori
-        // Contoh: /nama-subfolder-repo/service-worker.js
-        navigator.serviceWorker.register('/rgb-hex/RGB-Hex-7bedd7301005b9f4c3e28f6f8eecdb56cd37ee38/service-worker.js')
+        // Gunakan BASE_PATH untuk mendaftarkan service worker
+        navigator.serviceWorker.register(`${BASE_PATH}service-worker.js`)
             .then((registration) => {
                 console.log('Service Worker terdaftar dengan scope:', registration.scope);
             })
