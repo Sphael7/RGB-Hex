@@ -34,7 +34,7 @@ const rgbaSlidersInputSection = document.getElementById('rgbaSlidersInputSection
 const hamburgerMenuBtn = document.getElementById('hamburgerMenuBtn');
 const sideMenu = document.getElementById('sideMenu');
 const closeSideMenuBtn = document.getElementById('closeSideMenuBtn');
-const sideMenuOverlay = document="sideMenuOverlay";
+const sideMenuOverlay = document.getElementById('sideMenuOverlay'); // Ambil elemen overlay
 const viewPresetsBtnSide = document.getElementById('viewPresetsBtnSide');
 const moodBoardBtnSide = document.getElementById('moodBoardBtnSide');
 const exportPresetsBtnSide = document.getElementById('exportPresetsBtnSide');
@@ -66,15 +66,10 @@ let rainbowInterval = null; // Untuk mengontrol mode pelangi
 let isRainbowModeActive = false; // Status mode pelangi
 let isDarkMode = false; // Status tema gelap/terang
 
-// --- PENTING: SESUAIKAN BASE_PATH INI ---
-// Ganti nilai ini dengan jalur (path) folder proyek Anda di server,
-// dimulai dari akar domain.
-// Contoh: Jika aplikasi Anda diakses di `https://namadomain.com/my-app/index.html`,
-// maka BASE_PATH adalah '/my-app/'.
-// Berdasarkan file yang Anda berikan, kemungkinan seperti ini:
-const BASE_PATH = '/rgb-hex/RGB-Hex-7bedd7301005b9f4c3e28f6f8eecdb56cd37ee38/';
-// Jika aplikasi Anda langsung di akar domain (misal: https://namadomain.com/index.html),
-// maka gunakan: const BASE_PATH = '/';
+// --- PENTING: BASE_PATH TELAH Disesuaikan untuk domain root (rgb-hex-bay.vercel.app) ---
+// Karena URL Anda adalah rgb-hex-bay.vercel.app, BASE_PATH harus '/'
+const BASE_PATH = '/';
+// PASTIKAN ADA GARIS MIRING (/) DI AWAL DAN AKHIR JALUR!
 
 
 // Inisialisasi suara menggunakan howler.js

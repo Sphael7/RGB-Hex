@@ -1,12 +1,12 @@
-const CACHE_NAME = 'colorforge-v3'; // Tingkatkan versi cache setiap kali Anda mengubah aset yang di-cache
-const BASE_PATH = '/rgb-hex/RGB-Hex-7bedd7301005b9f4c3e28f6f8eecdb56cd37ee38/'; // Sesuaikan dengan BASE_PATH di script.js
+const CACHE_NAME = 'colorforge-v1';
+const BASE_PATH = '/'; // Ini harus sama dengan BASE_PATH di script.js dan start_url di manifest.json
 
 const urlsToCache = [
     // Cache halaman utama dan aset inti
     `${BASE_PATH}index.html`,
     `${BASE_PATH}style.css`,
     `${BASE_PATH}script.js`,
-    // Aset yang diunggah
+    // Aset ikon (pastikan path ini benar relatif terhadap BASE_PATH)
     `${BASE_PATH}icons/icon-192x192.png`,
     `${BASE_PATH}icons/icon-512x512.png`,
     `${BASE_PATH}icons/maskable_icon.png`,
@@ -23,11 +23,10 @@ self.addEventListener('install', (event) => {
         caches.open(CACHE_NAME)
             .then((cache) => {
                 console.log('Opened cache');
-                // Tambahkan semua URL ke cache. Jika ada yang gagal, instalasi akan gagal.
-                return cache.addAll(urlsToCache).catch(error => {
-                    console.error('Failed to cache some URLs:', error);
-                    // Lanjutkan meskipun ada kesalahan, tetapi catat untuk debugging
-                });
+                return cache.addAll(urlsToCache);
+            })
+            .catch(error => {
+                console.error('Failed to cache during install:', error);
             })
     );
 });
@@ -43,23 +42,24 @@ self.addEventListener('fetch', (event) => {
                 }
                 // Jika tidak ada, ambil dari jaringan
                 return fetch(event.request).then((networkResponse) => {
-                    // Hanya cache respons yang valid (status 200) dan bukan ekstensi
-                    if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-                        return caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, networkResponse.clone());
-                            return networkResponse;
-                        });
+                    // Hanya cache respons yang valid (status 200)
+                    if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                        return networkResponse;
                     }
-                    return networkResponse; // Jangan cache respons yang tidak valid
+
+                    // Caching aset baru saat diambil dari jaringan
+                    return caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
                 });
             })
             .catch(() => {
-                // Tangani kasus offline atau gagal fetch untuk resource penting
-                console.warn('Network request failed and no cache match found for:', event.request.url);
-                return new Response('Content is not available offline. Please check your internet connection or try again later.', {
-                    status: 503,
-                    statusText: 'Service Unavailable',
-                    headers: new Headers({'Content-Type': 'text/plain'})
+                // Tangani kasus offline atau gagal fetch
+                // Anda bisa mengarahkan ke halaman offline khusus jika ada
+                // return caches.match(`${BASE_PATH}offline.html`);
+                return new Response('<h1>You are offline.</h1><p>Please check your internet connection.</p>', {
+                    headers: { 'Content-Type': 'text/html' }
                 });
             })
     );
